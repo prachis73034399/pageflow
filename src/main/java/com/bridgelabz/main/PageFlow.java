@@ -1,41 +1,30 @@
 package com.bridgelabz.main;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import com.bridgelabz.csvReader.CsvRead;
-import com.bridgelabz.model.PageAction;
 import com.bridgelabz.pageRouteDepth.PageRouteDepth;
-import com.csvreader.CsvReader;
-import com.csvreader.CsvReader;
 
 public class PageFlow 
 {
 	
-	public static void main(String[] args) throws IOException
+	public static void main(String[] args) throws Exception
 	{
-		BufferedReader br= new BufferedReader(new InputStreamReader(System.in));
+		PageRouteDepth pageRouteDepthObject = new PageRouteDepth();
+		// creating hashMap object of sessionHashMap
 		
-		System.out.println("Enter a value to find:");
-		String value= br.readLine();
-		PageRouteDepth pageroute= new PageRouteDepth(value);
-		
+		HashMap<String, List<String>> sessionHashMap = new HashMap<String, List<String>>();
+		HashMap<String, Integer> pageRouteDepthCount = new HashMap<String, Integer>();
+		// creating object of the CsvRead class 
 		CsvRead csv = new CsvRead();
-		csv.csvReadMethod();
-	
 		
-	
-	}
-
-	public void rfiu()
-	{
-
-		ArrayList<HashMap<String,String>> arrayList = new ArrayList<HashMap<String, String>>();
-		HashMap<String,String> hashMap = new HashMap<String, String>();
+		// caling method csvReadMethod of CsvRead Method
+		sessionHashMap = csv.csvReadMethod();
+		System.out.println(sessionHashMap);
+		pageRouteDepthCount =pageRouteDepthObject.pageDepthCount(sessionHashMap);
+		System.out.println("pageroute HashMap "+pageRouteDepthCount);
+		
 	}
 }

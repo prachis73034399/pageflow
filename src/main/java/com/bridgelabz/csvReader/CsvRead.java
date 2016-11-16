@@ -1,97 +1,102 @@
 package com.bridgelabz.csvReader;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
 
 import com.bridgelabz.model.PageAction;
 import com.bridgelabz.pageRouteDepth.PageRouteDepth;
 import com.csvreader.CsvReader;
-import java.util.Properties;
+
 
 public class CsvRead 
 {
-	InputStream inputStream;
-	PageRouteDepth pageroute= new PageRouteDepth();
+	HashMap<String, List<String>> sessionHashMap = new HashMap<String, List<String>>();
 	
-	public void csvReadMethod()
-	{
-	String pageId = null;
-	String pageName = null;
-	String actionId = null;
-	long count= 0; 
-	PageAction pageAction= new PageAction(pageId, actionId, pageName);
-	String sessionID= null;
-	try 
-	{
-		/*Properties prop = new Properties();
-		String propFileName = "/home/bridgeit/Desktop/pgflow/src/resources/config.properties";
-		//inputStream = new FileInputStream("/resources/config.properties");
+	// Creating object of PageAction class
+	PageAction pageAction= new PageAction();
+	
+	InputStream inputStream;;
+	//.............Initializing Variables.............
+	String pageRoute,  pageId, pageName, actionId, pageRoute1, sessionId, sessionId1, pageId1, line;
+	
+	int csvSessionId, csvPageId, i, count=0;
+	
 
-		inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
-
-		if (inputStream != null)
+	public HashMap<String, List<String>> csvReadMethod() 
+	{
+		
+		
+		String sessionId;
+		try 
 		{
-			prop.load(inputStream);
-		} else {
-			throw new FileNotFoundException("property file  not found in the classpath");
-		}
-
-		//Date time = new Date(System.currentTimeMillis());
-
-		// get the property value and print it out
-		String csvpageid = prop.getProperty("csv.pageid");*/
-		
-		
-		
-		
-		
-		CsvReader csvReaderObject = new CsvReader("/home/bridgeit/Downloads/pageflow.csv", '	');
-		while (csvReaderObject.readRecord())
-		{ 
-			
-			String pageRoute= null;
-			sessionID = csvReaderObject.get(47);
-			//String date = csvReaderObject.get(46);
-			pageId = csvReaderObject.get(26);
-			pageAction.setPageId(pageId);
-			String PgId= pageAction.getPageId();
-			
-			if(PgId.length()>=3)
+			// Initializing Predefined Properties class and making object of the same
+			Properties prop = new Properties();
+			String propFileName = "/home/bridgeit/Desktop/pgflow/src/resources/config.properties";
+			// passing propFileName to the FileInputStream class object 
+			FileInputStream fis = new FileInputStream(propFileName);
+			if (fis != null)
 			{
-				pageRoute =PgId.substring(0,3);
+				// calling load method of Properties class
+				prop.load(fis);
 			}
 			else
 			{
-				pageRoute =PgId;
+				System.out.println("property file  not found in the classpath");
 			}
-			pageroute.pageDepth(pageRoute);
-			System.out.println( "Page id length= "+PgId.length());
-			actionId = csvReaderObject.get(0);
-			pageAction.setActionId(actionId);
-			String ActionId= pageAction.getActionId();
+	
+			// ...............get the property value and store it into variablr............
+			csvPageId = Integer.parseInt(prop.getProperty("csv.pageid"));
+			csvSessionId = Integer.parseInt(prop.getProperty("sessionId"));
+			String csvFile =prop.getProperty("csvFile");
 			
-			System.out.println("Session Id:"+sessionID+" PageId :"+PgId+ " pageRoute :"+ pageRoute);
-			count++;
-		}
-		
-		//System.out.println(count);
-		
-		//csvReaderObject.close();		
-	}
-	
-	catch (FileNotFoundException e)  
-	{
-		e.printStackTrace();
-	}
-	
-	catch (IOException e)
-	{
-		e.printStackTrace();
-	}
+			// Making Object of CsvReader class and reading 
+			CsvReader csvReaderObject = new CsvReader(csvFile, ',');
+			
+			
+			while (csvReaderObject.readRecord())
+			{ 
+				List<String> pageList= new ArrayList<String>();
+				
+				sessionId = csvReaderObject.get(csvSessionId);
+/*				if(sessionId.equals("session_id"))
+					continue;*/
+				
+				CsvReader csvReaderObject1 = new CsvReader(csvFile, ',');
+				while (csvReaderObject1.readRecord())
+				{ 
+					
+					sessionId1 = csvReaderObject1.get(csvSessionId);
+					//System.out.println("******"+sessionId1);
+/*					if(sessionId1.equals("session_id"))
+						continue;*/
+					
+					pageId = csvReaderObject1.get(csvPageId);
 
-}
+					if(sessionId.equals(sessionId1))
+					{
+						pageList.add(pageId);
+						sessionHashMap.put(sessionId, pageList);
+					}
+					
+				}
+				}
+			
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return sessionHashMap;
+	}
 }
 	
 
