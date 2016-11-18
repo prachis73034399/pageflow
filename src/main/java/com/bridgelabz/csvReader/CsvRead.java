@@ -19,22 +19,19 @@ import com.csvreader.CsvReader;
 
 public class CsvRead 
 {
+	// creating hashMap object for sessionId and pageId
 	HashMap<String, List<String>> sessionHashMap = new HashMap<String, List<String>>();
-	
 	// Creating object of PageAction class
 	PageAction pageAction= new PageAction();
-	
-	InputStream inputStream;;
 	//.............Initializing Variables.............
-	String pageRoute,  pageId, pageName, actionId, pageRoute1, sessionId, sessionId1, pageId1, line;
-	
+	String  pageId ,sessionId, sessionId1;
+	// intializing int variable
 	int csvSessionId, csvPageId, i, count=0;
 	
 
+	// creating method which will return hashMap having count for each sessionId list of PageId
 	public HashMap<String, List<String>> csvReadMethod() 
 	{
-		
-		
 		String sessionId;
 		try 
 		{
@@ -43,6 +40,7 @@ public class CsvRead
 			String propFileName = "/home/bridgeit/Desktop/pgflow/src/resources/config.properties";
 			// passing propFileName to the FileInputStream class object 
 			FileInputStream fis = new FileInputStream(propFileName);
+			
 			if (fis != null)
 			{
 				// calling load method of Properties class
@@ -58,43 +56,43 @@ public class CsvRead
 			csvSessionId = Integer.parseInt(prop.getProperty("sessionId"));
 			String csvFile =prop.getProperty("csvFile");
 			
-			// Making Object of CsvReader class and reading 
+			// Making Object of CsvReader class and reading csvFile
 			CsvReader csvReaderObject = new CsvReader(csvFile, ',');
 			
-			
+			// while loop goes till csvReaderObject has records
 			while (csvReaderObject.readRecord())
 			{ 
 				List<String> pageList= new ArrayList<String>();
 				
+				// reading session id using  csvReaderObject
 				sessionId = csvReaderObject.get(csvSessionId);
-/*				if(sessionId.equals("session_id"))
-					continue;*/
-				
+
+				// Making Object of CsvReader class and reading  csvFile
 				CsvReader csvReaderObject1 = new CsvReader(csvFile, ',');
+				// second time creating while loop for reading all session id
 				while (csvReaderObject1.readRecord())
 				{ 
-					
+					// reading session id using  csvReaderObject
 					sessionId1 = csvReaderObject1.get(csvSessionId);
-					//System.out.println("******"+sessionId1);
-/*					if(sessionId1.equals("session_id"))
-						continue;*/
-					
+					// reading session id using  csvReaderObject
 					pageId = csvReaderObject1.get(csvPageId);
-
+					
+					// every sessionId will check for equality with each session id
 					if(sessionId.equals(sessionId1))
 					{
+						// pageid will be added into list of pageId for particular sessionId
 						pageList.add(pageId);
+						// putting sessionId and pageList in hashMap
 						sessionHashMap.put(sessionId, pageList);
 					}
-					
 				}
-				}
-			
+			}
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
+		// returning sessionHashMap Object having pageId for each hashMap
 		return sessionHashMap;
 	}
 }
